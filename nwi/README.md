@@ -1,4 +1,15 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.15.2
+---
+
 # National Wetlands Inventory
+
+[![image](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opengeos/source-coop-readme/blob/main/nwi/README.ipynb)
 
 ## Description
 
@@ -17,9 +28,15 @@ conda install -c conda-forge mamba
 mamba install -c conda-forge libgdal-arrow-parquet gdal leafmap
 ```
 
+If you are using Google Colab, you can install the packages as follows:
+
+```{code-cell} ipython3
+# %pip install leafmap
+```
+
 Then, run the script below:
 
-```python
+```{code-cell} ipython3
 import leafmap
 import pandas as pd
 
@@ -35,7 +52,7 @@ leafmap.download_files(urls, out_dir='.', unzip=True)
 
 The script below was used to convert the data from the original Geodatabase format to [Parquet](https://parquet.apache.org) format. The script uses the [leafmap](https://leafmap.org) Python package.
 
-```python
+```{code-cell} ipython3
 import leafmap
 import pandas as pd
 
@@ -56,7 +73,7 @@ The total file size of the Geodatabase files is 32.5 GB. The total file size of 
 
 The script below can be used to access the data using [DuckDB](https://duckdb.org). The script uses the [duckdb](https://duckdb.org) Python package.
 
-```python
+```{code-cell} ipython3
 import duckdb
 
 con = duckdb.connect()
@@ -78,28 +95,45 @@ aws s3 ls s3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/
 
 To visualize the data, you can use the [leafmap](https://leafmap.org) Python package with the [lonboard](https://github.com/developmentseed/lonboard) backend. The script below shows how to install the lonboard backend.
 
-```bash
-pip install lonboard
+```{code-cell} ipython3
+% pip install lonboard
 ```
 
 After installing the lonboard backend, you can use the script below to visualize the data.
 
-```python
-import duckdb
-import leafmap.deckgl as leafmap
-
-con = duckdb.connect()
-con.install_extension("spatial")
-con.load_extension("spatial")
+```{code-cell} ipython3
+import leafmap
 
 state = "DC"   # Change to the US State of your choice
 url = f"https://data.source.coop/giswqs/nwi/wetlands/{state}_Wetlands.parquet"
-df = con.sql(f"SELECT * EXCLUDE geometry, ST_AsText(ST_GeomFromWKB(geometry)) AS geometry FROM '{url}'").df()
-gdf = leafmap.df_to_gdf(df, src_crs="EPSG:5070", dst_crs="EPSG:4326")
-
-m = leafmap.Map()
-m.add_gdf(gdf)
-m
+gdf = leafmap.read_parquet(url, return_type='gdf', src_crs='EPSG:5070', dst_crs='EPSG:4326')
+leafmap.view_vector(gdf, get_fill_color=[0, 0, 255, 128])
 ```
 
-![](https://i.imgur.com/nDYBWfX.png)
+![vector](https://i.imgur.com/HRtpiVd.png)
+
+Alternatively, you can specify a color map to visualize the data.
+
+```{code-cell} ipython3
+color_map =  {
+        "Freshwater Forested/Shrub Wetland": (0, 136, 55),
+        "Freshwater Emergent Wetland": (127, 195, 28),
+        "Freshwater Pond": (104, 140, 192),
+        "Estuarine and Marine Wetland": (102, 194, 165),
+        "Riverine": (1, 144, 191),
+        "Lake": (19, 0, 124),
+        "Estuarine and Marine Deepwater": (0, 124, 136),
+        "Other Freshwater Wetland": (178, 134, 86),
+    }
+leafmap.view_vector(gdf, color_column='WETLAND_TYPE', color_map=color_map, opacity=0.5)
+```
+
+![vector-color](https://i.imgur.com/Ejh8hK6.png)
+
+Display a legend for the data.
+
+```{code-cell} ipython3
+leafmap.Legend(title="Wetland Type", legend_dict=color_map)
+```
+
+![legend](https://i.imgur.com/fxzHHFN.png)
