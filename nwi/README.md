@@ -31,7 +31,7 @@ mamba install -c conda-forge libgdal-arrow-parquet gdal leafmap
 If you are using Google Colab, you can install the packages as follows:
 
 ```{code-cell} ipython3
-# %pip install leafmap
+# %pip install leafmap lonboard==0.3.0
 ```
 
 Then, run the script below:
@@ -93,13 +93,7 @@ aws s3 ls s3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/
 
 ## Data visualization
 
-To visualize the data, you can use the [leafmap](https://leafmap.org) Python package with the [lonboard](https://github.com/developmentseed/lonboard) backend. The script below shows how to install the lonboard backend.
-
-```{code-cell} ipython3
-% pip install lonboard
-```
-
-After installing the lonboard backend, you can use the script below to visualize the data.
+To visualize the data, you can use the [leafmap](https://leafmap.org) Python package with the [lonboard](https://github.com/developmentseed/lonboard) backend. The script below shows how to visualize the data.
 
 ```{code-cell} ipython3
 import leafmap
