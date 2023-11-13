@@ -123,7 +123,7 @@ color_map =  {
         "Riverine": (1, 144, 191),
         "Lake": (19, 0, 124),
         "Estuarine and Marine Deepwater": (0, 124, 136),
-        "Other Freshwater Wetland": (178, 134, 86),
+        "Other": (178, 134, 86),
     }
 leafmap.view_vector(gdf, color_column='WETLAND_TYPE', color_map=color_map, opacity=0.5)
 ```
