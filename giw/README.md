@@ -5,10 +5,6 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.15.2
-kernelspec:
-  display_name: geo
-  language: python
-  name: python3
 ---
 
 # Non-Floodplain Wetlands
@@ -17,13 +13,11 @@ kernelspec:
 
 ## Description
 
-This dataset represents the extent and approximate location of Geographically Isolated Wetlands (GIWs), also known as non-floodplain wetlands (NFWs), in the conterminous United States. National Wetlands Inventory (NWI) lacustrine systems and palustrine wetlands were determined to be “isolated” based on their geographic location (i.e., unconnected, based on a distance measure, to specific classes of NHD aquatic systems). GIWs were here considered geographically isolated when they were outside of 10 meters from select NHD lines and polygons or were not adjacent to NWI Riverine or Estuarine wetlands and (where applicable) outside of 10 meters from a coastline (e.g., oceans or Great Lakes).
-
-This dataset is a copy of the [Geographically Isolated Wetlands](https://catalog.data.gov/dataset/geographically-isolated-wetlands-non-floodplain-wetlands-of-the-conterminous-united-states1), offering the data in more GIS-friendly and [cloud-native geospatial](https://cloudnativegeo.org) formats. The original dataset is distributed as zipped Geodatabase files, and is available for download from [here](https://gaftp.epa.gov/EPADataCommons/ORD/CONUS_NFWs/).
+This dataset represents the extent and approximate location of [Geographically Isolated Wetlands](https://catalog.data.gov/dataset/geographically-isolated-wetlands-non-floodplain-wetlands-of-the-conterminous-united-states1) (GIWs), also known as non-floodplain wetlands (NFWs), in the conterminous United States. National Wetlands Inventory (NWI) lacustrine systems and palustrine wetlands were determined to be “isolated” based on their geographic location (i.e., unconnected, based on a distance measure, to specific classes of NHD aquatic systems). GIWs were here considered geographically isolated when they were outside of 10 meters from select NHD lines and polygons or were not adjacent to NWI Riverine or Estuarine wetlands and (where applicable) outside of 10 meters from a coastline (e.g., oceans or Great Lakes).
 
 ## Reference
 
-- Lane, C. R., & D'Amico, E. (2016). Identification of putative geographically isolated wetlands of the conterminous United States. _JAWRA Journal of the American Water Resources Association_, 52(3), 705-722. <https://doi.org/10.1111/1752-1688.12421>
+- Lane, C. R., & D'Amico, E. (2016). Identification of putative geographically isolated wetlands of the conterminous United States. JAWRA Journal of the American Water Resources Association, 52(3), 705-722. https://doi.org/10.1111/1752-1688.12421
 
 ## Environment setup
 
@@ -37,7 +31,7 @@ mamba install -c conda-forge libgdal-arrow-parquet gdal leafmap
 pip install lonboard
 ```
 
-If you are using Google Colab, you can install the packages as follows:
+If you are using Google Colab, you can uncomment the following to install the packages and restart the runtime after installation.
 
 ```{code-cell} ipython3
 # %pip install leafmap lonboard
@@ -45,9 +39,7 @@ If you are using Google Colab, you can install the packages as follows:
 
 ## Data download
 
-Click on this [link](https://gaftp.epa.gov/EPADataCommons/ORD/CONUS_NFWs/Geographically_Isolated_Wetlands_of_ConterminousUnitedStates.gdb.zip) to download the data to your computer and unzip it. 
-
-+++
+Click on this [link](https://gaftp.epa.gov/EPADataCommons/ORD/CONUS_NFWs/Geographically_Isolated_Wetlands_of_ConterminousUnitedStates.gdb.zip) to download the data to your computer and unzip it.
 
 ## Data conversion
 
@@ -59,7 +51,7 @@ import leafmap
 
 ```{code-cell} ipython3
 gdb = 'Geographically_Isolated_Wetlands_of_ConterminousUnitedStates.gdb'
-# leafmap.gdb_to_vector(gdb, "/media/hdd/Data/NFW/GIW/Parquet/", gdal_driver="Parquet")
+# leafmap.gdb_to_vector(gdb, ".", gdal_driver="Parquet")
 ```
 
 The total file size of the Geodatabase files is 4.4 GB. The total file size of the Parquet files is 46.4 GB.
@@ -134,8 +126,6 @@ leafmap.pie_chart(count_df, 'State', 'Count', height=700, title='Number of Non-F
 
 ![](https://i.imgur.com/GgtlcWB.png)
 
-+++
-
 Create a bar chart showing the number of non-floodplain wetlands in each state:
 
 ```{code-cell} ipython3
@@ -143,8 +133,6 @@ leafmap.bar_chart(count_df, 'State', 'Count', title='Number of Non-Floodplain We
 ```
 
 ![](https://i.imgur.com/v4zz8zV.png)
-
-+++
 
 Calculate the total area of non-floodplain wetlands in each state and order them by the area of wetlands:
 
@@ -165,8 +153,6 @@ leafmap.pie_chart(sum_df, 'State', 'Hectares', height=700, title='Area of Non-Fl
 
 ![](https://i.imgur.com/mAsLCDE.png)
 
-+++
-
 Create a pie chart showing the total area of non-floodplain wetlands in each state:
 
 ```{code-cell} ipython3
@@ -174,8 +160,6 @@ leafmap.bar_chart(sum_df, 'State', 'Hectares', title='Area of Non-Floodplain Wet
 ```
 
 ![](https://i.imgur.com/7RtioFU.png)
-
-+++
 
 Find out the mean area of non-floodplain wetlands in each state and order them by the mean area of wetlands:
 
