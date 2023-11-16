@@ -103,7 +103,8 @@ Find out the total number non-floodplain wetlands in the conterminous United Sta
 
 ```{code-cell} ipython3
 con.sql(f"""
-SELECT COUNT(*) AS Count FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
+SELECT COUNT(*) AS Count
+FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
 """)
 ```
 
@@ -111,7 +112,8 @@ Find out the number of non-floodplain wetlands in each state and order them by t
 
 ```{code-cell} ipython3
 count_df = con.sql(f"""
-SELECT inState AS State, COUNT(*) AS Count FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
+SELECT inState AS State, COUNT(*) AS Count
+FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
 GROUP BY inState
 ORDER BY COUNT(*) DESC;
 """).df()
@@ -138,7 +140,8 @@ Calculate the total area of non-floodplain wetlands in each state and order them
 
 ```{code-cell} ipython3
 sum_df = con.sql(f"""
-SELECT inState AS State, Sum(hectares) AS Hectares FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
+SELECT inState AS State, Sum(hectares) AS Hectares
+FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
 GROUP BY inState
 ORDER BY Sum(hectares) DESC;
 """).df()
@@ -165,7 +168,8 @@ Find out the mean area of non-floodplain wetlands in each state and order them b
 
 ```{code-cell} ipython3
 median_df = con.sql(f"""
-SELECT inState AS State, median(hectares)*10000 AS Meters FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
+SELECT inState AS State, median(hectares)*10000 AS Meters
+FROM 's3://us-west-2.opendata.source.coop/giswqs/giw/wetlands/*.parquet'
 GROUP BY inState
 ORDER BY median(hectares) DESC;
 """).df()
