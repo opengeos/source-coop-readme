@@ -131,3 +131,162 @@ leafmap.Legend(title="Wetland Type", legend_dict=color_map)
 ```
 
 ![legend](https://i.imgur.com/fxzHHFN.png)
+
+## Data analysis
+
+Find out the total number of wetlands in the United States by aggregating the 51 parquet files.
+
+```{code-cell} ipython3
+con.sql(f"""
+SELECT COUNT(*) AS Count
+FROM 's3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/*.parquet'
+""")
+```
+
+Find out the number of wetlands in each state. Note that the NWI datasets do not contain a field for state names. The `filename` argument can be used to add an extra `filename` column to the result that indicates which row came from which file.
+
+```{code-cell} ipython3
+df = con.sql(f"""
+SELECT filename, COUNT(*) AS Count
+FROM read_parquet('s3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/*.parquet', filename=true)
+GROUP BY filename
+ORDER BY COUNT(*) DESC;
+""").df()
+df.head()
+```
+
+Inspect the list of filenames.
+
+```{code-cell} ipython3
+df['filename'].tolist()
+```
+
+Create a `State` column based on the `filename` column by extracting the state name from the filename.
+
+```{code-cell} ipython3
+count_df = con.sql(f"""
+SELECT SUBSTRING(filename, LENGTH(filename) - 18, 2) AS State, COUNT(*) AS Count
+FROM read_parquet('s3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/*.parquet', filename=true)
+GROUP BY State
+ORDER BY COUNT(*) DESC;
+""").df()
+count_df.head(10)
+```
+
+Create a `wetlands` table from the DataFrame above.
+
+```{code-cell} ipython3
+con.sql("CREATE OR REPLACE TABLE wetlands AS FROM count_df")
+con.sql("FROM wetlands")
+```
+
+To visualize the data on the map, we need a GeoDataFrame. Let's create a `states` table from the [us_states.parquet](https://open.gishub.org/data/us/us_states.parquet) file.
+
+```{code-cell} ipython3
+url = 'https://open.gishub.org/data/us/us_states.parquet'
+con.sql(
+    f"""
+CREATE OR REPLACE TABLE states AS
+SELECT * EXCLUDE geometry, ST_GeomFromWKB(geometry)
+AS geometry FROM '{url}'
+"""
+)
+con.sql("FROM states")
+```
+
+Join the `wetlands` table with the `states` table.
+
+```{code-cell} ipython3
+con.sql("""
+SELECT * FROM states INNER JOIN wetlands ON states.id = wetlands.State
+""")
+```
+
+Export the joined table as a Pandas DataFrame.
+
+```{code-cell} ipython3
+df = con.sql("""
+SELECT name, State, Count, ST_AsText(geometry) as geometry
+FROM states INNER JOIN wetlands ON states.id = wetlands.State
+""").df()
+df.head()
+```
+
+Convert the Pandas DataFrame to a GeoDataFrame.
+
+```{code-cell} ipython3
+gdf = leafmap.df_to_gdf(df, src_crs="EPSG:4326")
+```
+
+Visualize the data on the map.
+
+```{code-cell} ipython3
+m = leafmap.Map()
+m.add_data(
+    gdf, column='Count', scheme='Quantiles', cmap='Greens', legend_title='Wetland Count'
+)
+m
+```
+
+![](https://i.imgur.com/x9nJWZR.png)
+
++++
+
+Create a pie chart to show the percentage of wetlands in each state.
+
+```{code-cell} ipython3
+leafmap.pie_chart(count_df, 'State', 'Count', height=800, title='Number of Wetlands by State')
+```
+
+![](https://i.imgur.com/EQFZW4x.png)
+
++++
+
+Create a bar chart to show the number of wetlands in each state.
+
+```{code-cell} ipython3
+leafmap.bar_chart(count_df, 'State', 'Count', title='Number of Wetlands by State')
+```
+
+![](https://i.imgur.com/dNjh9lp.png)
+
++++
+
+Calculate the total area of wetlands in the United States. It takes about 3 minutes to run this query. Please be patient.
+
+```{code-cell} ipython3
+con.sql(f"""
+SELECT SUM(Shape_Area) /  1000000 AS Area_SqKm
+FROM 's3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/*.parquet'
+""")
+```
+
+Calculate the total area of wetlands in each state. It takes about 3 minutes to run this query. Please be patient.
+
+```{code-cell} ipython3
+area_df = con.sql(f"""
+SELECT SUBSTRING(filename, LENGTH(filename) - 18, 2) AS State, SUM(Shape_Area) /  1000000 AS Area_SqKm
+FROM read_parquet('s3://us-west-2.opendata.source.coop/giswqs/nwi/wetlands/*.parquet', filename=true)
+GROUP BY State
+ORDER BY COUNT(*) DESC;
+""").df()
+area_df.head(10)
+```
+
+Create a pie chart to show the percentage of wetlands in each state.
+
+```{code-cell} ipython3
+leafmap.pie_chart(area_df, 'State', 'Area_SqKm', height=900, title='Wetland Area by State')
+```
+
+![](https://i.imgur.com/tIy2fLt.png)
+
++++
+
+Create a bar chart to show the wetland area in each state.
+
+```{code-cell} ipython3
+leafmap.bar_chart(area_df, 'State', 'Area_SqKm', title='Wetland Area by State')
+```
+
+![](https://i.imgur.com/EyJQZNP.png)
