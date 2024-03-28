@@ -230,8 +230,6 @@ m
 
 ![](https://i.imgur.com/x9nJWZR.png)
 
-+++
-
 Create a pie chart to show the percentage of wetlands in each state.
 
 ```{code-cell} ipython3
@@ -240,8 +238,6 @@ leafmap.pie_chart(count_df, 'State', 'Count', height=800, title='Number of Wetla
 
 ![](https://i.imgur.com/EQFZW4x.png)
 
-+++
-
 Create a bar chart to show the number of wetlands in each state.
 
 ```{code-cell} ipython3
@@ -249,8 +245,6 @@ leafmap.bar_chart(count_df, 'State', 'Count', title='Number of Wetlands by State
 ```
 
 ![](https://i.imgur.com/dNjh9lp.png)
-
-+++
 
 Calculate the total area of wetlands in the United States. It takes about 3 minutes to run this query. Please be patient.
 
@@ -280,8 +274,6 @@ leafmap.pie_chart(area_df, 'State', 'Area_SqKm', height=900, title='Wetland Area
 ```
 
 ![](https://i.imgur.com/tIy2fLt.png)
-
-+++
 
 Create a bar chart to show the wetland area in each state.
 
