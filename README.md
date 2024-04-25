@@ -5,3 +5,4 @@ Readme file and Jupyter notebook examples for data repositories on Source Cooper
 ## Datasets
 
 - [National Wetlands Inventory](https://beta.source.coop/repositories/giswqs/nwi/description)
+- [National Surface Depressions](https://beta.source.coop/repositories/giswqs/depressions/description)
